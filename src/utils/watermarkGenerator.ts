@@ -229,7 +229,9 @@ export async function drawWatermark(
 
   const photoWidth = img.width * photoScale;
   const photoHeight = img.height * photoScale;
-  const photoCornerRadius = config.cornerRadius;
+
+  // 将圆角值与照片的缩放比例关联，以确保在不同尺寸下视觉效果一致
+  const photoCornerRadius = config.cornerRadius * photoScale;
 
   const photoX = (canvasWidth - photoWidth) / 2;
   const photoY = (photoAreaHeight - photoHeight) / 2; // 在其专属区域内垂直居中
@@ -255,7 +257,8 @@ export async function drawWatermark(
 
   // 5. 绘制文字
   const { cameraText, paramsText } = generateWatermarkText(photo.exif || {});
-  const titleFontSize = canvasWidth / 45; // 文字大小与画布宽度挂钩，保持稳定
+  const baseFontSize = canvasWidth / 45; // 基准字体大小与画布宽度挂钩
+  const titleFontSize = baseFontSize * (config.fontSizeRatio / 100); // 根据设置的比例调整
   const paramsFontSize = titleFontSize * 0.8;
 
   // 将文字定位在照片底边与画布底边的中点
