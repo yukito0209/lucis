@@ -29,6 +29,7 @@ const App: React.FC = () => {
     landscapeOutput: false,
     useCustomOutputSize: false,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSizeRatio: 100,
   });
 
   const handleResizerMouseDown = useCallback(() => {

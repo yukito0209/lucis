@@ -10,6 +10,7 @@ export interface WatermarkConfig {
   landscapeOutput: boolean;
   useCustomOutputSize: boolean;
   fontFamily: string;
+  fontSizeRatio: number;
 }
 
 export interface PhotoExif {
