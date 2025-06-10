@@ -34,12 +34,6 @@ const Footer: React.FC<FooterProps> = ({ photoCount, completedCount, isGeneratin
         >
           {isGenerating ? '正在生成...' : '生成印框'}
         </button>
-        <button className="button" disabled={true}>
-          参数设置
-        </button>
-        <button className="button" disabled={true}>
-          模板设置
-        </button>
       </div>
     </div>
   );

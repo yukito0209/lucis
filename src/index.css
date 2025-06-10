@@ -75,6 +75,8 @@ body {
   overflow: auto; /* 保持可滚动以便在放大时平移 */
   min-height: 0; /* 一个关键的修复，防止grid/flex子项在缩小时溢出 */
   display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 24px;
 }
 

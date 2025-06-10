@@ -222,7 +222,7 @@ export async function drawWatermark(
   }
 
   // 2. 计算照片布局
-  const photoAreaHeight = canvasHeight * 0.8; // 为照片分配顶部80%的垂直空间
+  const photoAreaHeight = canvasHeight * 0.90; // 为照片分配顶部78%的垂直空间，为文字留出更多空间
   const photoAreaWidth = canvasWidth * 0.9;
   const basePhotoScale = Math.min(photoAreaWidth / img.width, photoAreaHeight / img.height);
   const photoScale = basePhotoScale * (config.mainImageRatio / 100);
@@ -257,16 +257,23 @@ export async function drawWatermark(
 
   // 5. 绘制文字
   const { cameraText, paramsText } = generateWatermarkText(photo.exif || {});
-  const baseFontSize = canvasWidth / 45; // 基准字体大小与画布宽度挂钩
-  const titleFontSize = baseFontSize * (config.fontSizeRatio / 100); // 根据设置的比例调整
-  const paramsFontSize = titleFontSize * 0.8;
+  const baseFontSize = canvasWidth / 45; 
+  const cameraFontSize = baseFontSize * (config.fontSizeRatio / 100);
+  const paramsFontSize = cameraFontSize * 0.8;
 
-  // 将文字定位在照片底边与画布底边的中点
+  // 将文字块整体定位于照片与画布底边之间的区域
   const photoBottom = photoY + photoHeight;
-  const midPointY = photoBottom + (canvasHeight - photoBottom) / 2;
-  const textBlockHeightEstimate = titleFontSize * 2.5; // 估算文字块高度
-  const titleY = midPointY - (textBlockHeightEstimate / 2) + titleFontSize;
-  const paramsY = titleY + titleFontSize * 1.5;
+  const textZoneStartY = photoBottom;
+  const textZoneHeight = canvasHeight - textZoneStartY;
+  
+  // 计算文字块的整体高度
+  const lineSpacing = cameraFontSize * 0.4;
+  const totalTextBlockHeight = paramsFontSize + lineSpacing + cameraFontSize;
+
+  // 计算每行文字的基线Y坐标，使其在文字区域内垂直居中
+  const blockStartY = textZoneStartY + (textZoneHeight - totalTextBlockHeight) / 2;
+  const paramsY = blockStartY + paramsFontSize;
+  const cameraY = paramsY + lineSpacing + cameraFontSize;
 
   // 设置文字绘制状态
   ctx.save();
@@ -277,11 +284,13 @@ export async function drawWatermark(
   ctx.shadowOffsetY = 0;
   ctx.textAlign = 'center';
 
-  ctx.font = `bold ${titleFontSize}px ${config.fontFamily}`;
-  ctx.fillText(cameraText, canvasWidth / 2, titleY);
-
+  // 绘制参数文字 (顶行，较小)
   ctx.font = `${paramsFontSize}px ${config.fontFamily}`;
   ctx.fillText(paramsText, canvasWidth / 2, paramsY);
+
+  // 绘制相机文字 (底行，较大，加粗)
+  ctx.font = `bold ${cameraFontSize}px ${config.fontFamily}`;
+  ctx.fillText(cameraText, canvasWidth / 2, cameraY);
   
   ctx.restore(); // 恢复状态，清除shadow效果
 }
