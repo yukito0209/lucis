@@ -193,6 +193,25 @@ lucis/
 4. 推送分支: `git push origin feature/新功能`
 5. 提交 Pull Request
 
+## 💖 支持作者
+
+如果这个项目对您有帮助，欢迎请作者喝杯咖啡 ☕
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>微信支付</strong><br/>
+      <img src="public/assets/pay/wechat-pay.jpg" alt="微信收款码" width="200"/>
+    </td>
+    <td align="center">
+      <strong>支付宝</strong><br/>
+      <img src="public/assets/pay/alipay.jpg" alt="支付宝收款码" width="200"/>
+    </td>
+  </tr>
+</table>
+
+> 您的支持是我继续开发和维护这个项目的动力！
+
 ## 🙏 致谢
 
 - **[yiyin](https://github.com/ggchivalrous/yiyin)**: 提供了项目灵感和参考
