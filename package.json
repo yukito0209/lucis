@@ -1,10 +1,15 @@
 {
-  "name": "automated-photo-stamp-tool",
+  "name": "lucis",
   "version": "1.0.0",
-  "description": "一键给你的照片添加水印的桌面应用",
+  "description": "Lucis拾光 - 为照片添加优雅水印的桌面应用",
   "main": "dist-electron/main.js",
-  "author": "Kerwin Wang",
+  "author": "yukito0209",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yukito0209/lucis.git"
+  },
+  "homepage": "https://github.com/yukito0209/lucis",
   "scripts": {
     "dev": "npm run build:electron && concurrently \"npm run dev:react\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
     "dev:react": "vite",
@@ -44,8 +49,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.kerwin.photo-stamp-tool",
-    "productName": "照片水印工具",
+    "appId": "com.yukito0209.lucis",
+    "productName": "Lucis拾光",
     "directories": {
       "output": "release"
     },

@@ -1,4 +1,4 @@
-import { PhotoExif } from '../types';
+import { PhotoExif, WatermarkConfig } from '../types';
 
 /**
  * 格式化快门速度
@@ -30,6 +30,7 @@ export function formatFocalLength(focalLength?: number): string | undefined {
 
 /**
  * 获取相机品牌的标准化名称
+ * @returns 返回一个小写的、标准化的品牌名称，用于匹配logo文件名，例如 'sony', 'canon'
  */
 export function getNormalizedCameraMake(make?: string): string | undefined {
   if (!make) return undefined;
@@ -38,17 +39,17 @@ export function getNormalizedCameraMake(make?: string): string | undefined {
   
   // 标准化相机品牌名称
   const brandMapping: { [key: string]: string } = {
-    'canon': 'Canon',
-    'nikon': 'Nikon', 
-    'sony': 'Sony',
-    'fujifilm': 'Fujifilm',
-    'olympus': 'Olympus',
-    'panasonic': 'Panasonic',
-    'leica': 'Leica',
-    'pentax': 'Pentax',
-    'ricoh': 'Ricoh',
-    'hasselblad': 'Hasselblad',
-    'phase one': 'Phase One'
+    'canon': 'canon',
+    'nikon': 'nikon', 
+    'sony': 'sony',
+    'fujifilm': 'fujifilm',
+    'olympus': 'olympus',
+    'panasonic': 'panasonic',
+    'leica': 'leica',
+    'pentax': 'pentax',
+    'ricoh': 'ricoh',
+    'hasselblad': 'hasselblad',
+    'phase one': 'phase one'
   };
 
   for (const [key, value] of Object.entries(brandMapping)) {
@@ -57,24 +58,34 @@ export function getNormalizedCameraMake(make?: string): string | undefined {
     }
   }
 
-  // 如果没有匹配到，返回首字母大写的原始值
-  return make.charAt(0).toUpperCase() + make.slice(1).toLowerCase();
+  // 如果没有匹配到，直接返回小写的原始值
+  return normalizedMake;
 }
 
 /**
  * 生成水印显示文本
  */
-export function generateWatermarkText(exif: PhotoExif): {
-  cameraText: string;
+export function generateWatermarkText(exif: PhotoExif, config: WatermarkConfig): {
+  brandName: string | undefined;
+  modelText: string;
   paramsText: string;
 } {
   // 相机和镜头信息
-  const make = getNormalizedCameraMake(exif.make) || '';
-  const model = exif.model || '';
-  const cameraText = `${make} ${model}`.trim();
+  const brandName = getNormalizedCameraMake(exif.make);
+  let modelText = exif.model || '';
+
+  // 增加处理逻辑：如果相机型号本身已经包含了品牌名，则移除品牌名，避免重复显示
+  if (brandName && modelText.toLowerCase().startsWith(brandName.toLowerCase())) {
+    modelText = modelText.slice(brandName.length).trim();
+  }
+
+  // 根据配置决定使用哪个焦距
+  const focalLengthValue = config.use35mmEquivalent && exif.focalLengthIn35mmFormat 
+    ? exif.focalLengthIn35mmFormat 
+    : exif.focalLength;
 
   // 拍摄参数信息
-  const focalLength = formatFocalLength(exif.focalLength) || '';
+  const focalLength = formatFocalLength(focalLengthValue) || '';
   const aperture = exif.aperture || '';
   const shutterSpeed = exif.shutterSpeed || '';
   const iso = exif.iso ? `ISO${exif.iso}` : '';
@@ -84,7 +95,8 @@ export function generateWatermarkText(exif: PhotoExif): {
     .join(' ');
 
   return {
-    cameraText,
+    brandName,
+    modelText,
     paramsText
   };
 } 

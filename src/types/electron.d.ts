@@ -16,6 +16,7 @@ export interface ElectronAPI {
   getDesktopPath: () => Promise<string>;
   minimizeWindow: () => void;
   closeWindow: () => void;
+  openExternal: (url: string) => Promise<void>;
 }
 
 declare global {

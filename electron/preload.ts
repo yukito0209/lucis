@@ -16,6 +16,7 @@ export interface ElectronAPI {
   getDesktopPath: () => Promise<string>;
   minimizeWindow: () => void;
   closeWindow: () => void;
+  openExternal: (url: string) => Promise<void>;
 }
 
 const electronAPI: ElectronAPI = {
@@ -27,6 +28,7 @@ const electronAPI: ElectronAPI = {
   getDesktopPath: () => ipcRenderer.invoke('get-desktop-path'),
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   closeWindow: () => ipcRenderer.send('window:close'),
+  openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI); 

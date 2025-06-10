@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as exifr from 'exifr';
@@ -66,10 +66,10 @@ function createWindow(): void {
     
     mainWindow.loadURL(devServerUrl);
     
-    // 等待页面加载完成后打开开发者工具
-    mainWindow.webContents.once('did-finish-load', () => {
-      mainWindow.webContents.openDevTools();
-    });
+    // 等待页面加载完成后打开开发者工具（已注释）
+    // mainWindow.webContents.once('did-finish-load', () => {
+    //   mainWindow.webContents.openDevTools();
+    // });
     
     // 处理加载错误
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
@@ -122,11 +122,6 @@ ipcMain.handle('photos:processBatch', async (_, filePaths: string[]) => {
       const buffer = await fs.promises.readFile(filePath);
       
       const exifData = await exifr.parse(buffer, {
-        pick: [
-          'Make', 'Model', 'LensModel', 'LensInfo',
-          'FNumber', 'ExposureTime', 'ISO', 'FocalLength', 'FocalLengthIn35mmFormat',
-          'DateTimeOriginal', 'ImageWidth', 'ImageHeight', 'Orientation'
-        ],
         tiff: true, ifd1: true, exif: true, gps: false, interop: false
       });
       
@@ -138,6 +133,7 @@ ipcMain.handle('photos:processBatch', async (_, filePaths: string[]) => {
         shutterSpeed: formatShutterSpeed(exifData.ExposureTime),
         iso: exifData.ISO,
         focalLength: exifData.FocalLength,
+        focalLengthIn35mmFormat: exifData.FocalLengthIn35mmFormat,
         dateTimeOriginal: exifData.DateTimeOriginal,
         imageWidth: exifData.ImageWidth,
         imageHeight: exifData.ImageHeight,
@@ -235,6 +231,16 @@ ipcMain.handle('fs:writeFile', async (_, filePath: string, data: ArrayBuffer) =>
     return true;
   } catch (error) {
     console.error('Error writing file:', error);
+    throw error;
+  }
+});
+
+// 处理外部链接打开
+ipcMain.handle('shell:openExternal', async (_, url: string) => {
+  try {
+    await shell.openExternal(url);
+  } catch (error) {
+    console.error('Error opening external URL:', error);
     throw error;
   }
 }); 

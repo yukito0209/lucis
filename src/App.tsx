@@ -20,8 +20,8 @@ const App: React.FC = () => {
   const [config, setConfig] = useState<WatermarkConfig>({
     outputDir: '',
     mainImageRatio: 90,
-    cornerRadius: 2.1,
-    shadowSize: 6,
+    cornerRadius: 200,
+    shadowSize: 20,
     outputQuality: 100,
     outputWidth: 0,
     outputHeight: 0,
@@ -30,6 +30,8 @@ const App: React.FC = () => {
     useCustomOutputSize: false,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSizeRatio: 100,
+    use35mmEquivalent: false,
+    backgroundBlur: 30,
   });
 
   const handleResizerMouseDown = useCallback(() => {

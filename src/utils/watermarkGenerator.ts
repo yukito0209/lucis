@@ -18,6 +18,20 @@ export interface GenerationResult {
 }
 
 /**
+ * Helper to load an image asynchronously.
+ * @param src The source URL of the image.
+ * @returns A promise that resolves with the HTMLImageElement or null if it fails to load.
+ */
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null); // Resolve with null on error
+    img.src = src;
+  });
+}
+
+/**
  * 生成单张照片的水印
  */
 export async function generateSingleWatermark(
@@ -186,7 +200,10 @@ export async function drawWatermark(
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
 
-  // 1. 绘制背景
+  // --- 1. 绘制背景并决定颜色方案 ---
+  let textColor = '#fafafa'; // 默认白色文字
+  let logoColorSuffix = 'w';  // 默认白色logo后缀 ('w')
+
   if (config.pureBackground) {
     // 智能提取主题色并作为背景
     const tempCanvas = document.createElement('canvas');
@@ -197,6 +214,13 @@ export async function drawWatermark(
       tempCtx.drawImage(img, 0, 0, 1, 1);
       const [r, g, b] = tempCtx.getImageData(0, 0, 1, 1).data;
       ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+
+      // 根据背景亮度决定文字和logo颜色
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (luminance > 140) { // 阈值140，亮度高于此值视为亮色背景
+        textColor = '#333333';
+        logoColorSuffix = 'b'; // 使用黑色logo后缀 ('b')
+      }
     } else {
       ctx.fillStyle = '#cccccc'; // 备用颜色
     }
@@ -210,8 +234,8 @@ export async function drawWatermark(
     const bgY = (canvasHeight - bgHeight) / 2;
 
     ctx.save();
-    // 使用相对于Canvas尺寸的模糊值，确保在不同尺寸下效果一致
-    const blurAmount = Math.min(canvasWidth, canvasHeight) * 0.015; // 约为较短边的1.5%
+    // 将模糊度配置值转换为相对于画布尺寸的动态值，以确保效果一致
+    const blurAmount = Math.min(canvasWidth, canvasHeight) * (config.backgroundBlur / 1500);
     ctx.filter = `blur(${blurAmount}px) brightness(0.7)`;
     ctx.drawImage(img, bgX, bgY, bgWidth, bgHeight);
     ctx.restore();
@@ -255,12 +279,17 @@ export async function drawWatermark(
   ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
   ctx.restore();
 
-  // 5. 绘制文字
-  const { cameraText, paramsText } = generateWatermarkText(photo.exif || {});
-  const baseFontSize = canvasWidth / 45; 
+  // 5. 绘制文字和 LOGO
+  const { brandName, modelText, paramsText } = generateWatermarkText(photo.exif || {}, config);
+  // 使用画布的长边作为文字大小的计算基准，以确保在横幅和竖幅照片上文字大小一致
+  const baseFontSize = Math.max(canvasWidth, canvasHeight) / 45;
   const cameraFontSize = baseFontSize * (config.fontSizeRatio / 100);
   const paramsFontSize = cameraFontSize * 0.8;
 
+  // 尝试加载logo
+  const logoUrl = brandName ? `/assets/logos/${brandName}-${logoColorSuffix}.svg` : null;
+  const logoImg = logoUrl ? await loadImage(logoUrl) : null;
+  
   // 将文字块整体定位于照片与画布底边之间的区域
   const photoBottom = photoY + photoHeight;
   const textZoneStartY = photoBottom;
@@ -273,24 +302,63 @@ export async function drawWatermark(
   // 计算每行文字的基线Y坐标，使其在文字区域内垂直居中
   const blockStartY = textZoneStartY + (textZoneHeight - totalTextBlockHeight) / 2;
   const paramsY = blockStartY + paramsFontSize;
-  const cameraY = paramsY + lineSpacing + cameraFontSize;
+  const cameraLineY = paramsY + lineSpacing + cameraFontSize;
 
   // 设置文字绘制状态
   ctx.save();
-  ctx.fillStyle = '#fafafa';
+  ctx.fillStyle = textColor;
   ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
   ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
+  
+  // --- 绘制顶行：参数文字 ---
   ctx.textAlign = 'center';
-
-  // 绘制参数文字 (顶行，较小)
   ctx.font = `${paramsFontSize}px ${config.fontFamily}`;
   ctx.fillText(paramsText, canvasWidth / 2, paramsY);
 
-  // 绘制相机文字 (底行，较大，加粗)
+  // --- 绘制底行：Logo + 型号 / 品牌名 + 型号 ---
   ctx.font = `bold ${cameraFontSize}px ${config.fontFamily}`;
-  ctx.fillText(cameraText, canvasWidth / 2, cameraY);
+  
+  if (logoImg) {
+    // case 1: Logo加载成功，绘制Logo + 型号
+    const logoHeight = cameraFontSize * 0.78;
+    const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
+    const textLogoSpacing = cameraFontSize * 0.3;
+    
+    const modelTextWidth = ctx.measureText(modelText).width;
+    const totalWidth = logoWidth + textLogoSpacing + modelTextWidth;
+    
+    const startX = (canvasWidth - totalWidth) / 2;
+    const logoX = startX;
+    const modelX = startX + logoWidth + textLogoSpacing;
+    
+    // --- 精准垂直对齐 ---
+    // 1. 计算logo的垂直中心
+    const lineCenterY = cameraLineY - cameraFontSize / 2; // 先估算整行的中线
+    const logoY = lineCenterY - logoHeight / 2;
+    const logoCenterY = logoY + logoHeight / 2;
+
+    // 2. 使用TextMetrics获取文字的精确渲染边界，计算其视觉中心
+    const textMetrics = ctx.measureText(modelText);
+    const textAscent = textMetrics.actualBoundingBoxAscent;
+    const textDescent = textMetrics.actualBoundingBoxDescent;
+    
+    // 3. 计算能让文字视觉中心与logo视觉中心对齐的基线Y坐标
+    const modelBaselineY = logoCenterY + (textAscent - (textAscent + textDescent) / 2);
+
+    // 4. 绘制logo和文字
+    ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic'; // 使用标准的字母基线进行绘制
+    ctx.fillText(modelText, modelX, modelBaselineY);
+
+  } else {
+    // case 2: Logo加载失败，绘制 品牌名 + 型号
+    const cameraText = `${brandName ? brandName.toUpperCase() : ''} ${modelText}`.trim();
+    ctx.textAlign = 'center';
+    ctx.fillText(cameraText, canvasWidth / 2, cameraLineY);
+  }
   
   ctx.restore(); // 恢复状态，清除shadow效果
 }
@@ -326,6 +394,14 @@ export function calculateOutputDimensions(
   img: HTMLImageElement,
   config: WatermarkConfig
 ): { width: number; height: number } {
+  // 优先检查并使用自定义尺寸
+  if (config.useCustomOutputSize && config.outputWidth > 0 && config.outputHeight > 0) {
+    return {
+      width: config.outputWidth,
+      height: config.outputHeight,
+    };
+  }
+
   // 如果输出质量为100，则以原图尺寸为基础进行计算
   if (config.outputQuality === 100) {
     let width = img.width;
@@ -335,14 +411,6 @@ export function calculateOutputDimensions(
         [width, height] = [height, width];
     }
     return { width, height };
-  }
-
-  // 如果启用了自定义尺寸，则直接使用
-  if (config.useCustomOutputSize && config.outputWidth > 0 && config.outputHeight > 0) {
-    return {
-      width: config.outputWidth,
-      height: config.outputHeight,
-    };
   }
 
   // 自动尺寸计算：基于黄金比例创建具有美感的画框
