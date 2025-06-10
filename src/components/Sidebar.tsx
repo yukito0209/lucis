@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
     <div className="sidebar">
       <h2 style={{ marginBottom: '30px', fontSize: '18px', fontWeight: '600', textAlign: 'center' }}>水印设置</h2>
       
-      {/* 输出目录 */}
+      {/* --- 全局设置 --- */}
       <div className="form-group">
         <LabelWithTooltip label="输出目录" tooltipText="选择生成后图片的保存位置。" />
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -66,57 +66,6 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
           </button>
         </div>
       </div>
-
-      {/* 主图占比 */}
-      <div className="form-group">
-        <LabelWithTooltip label="主图占比" tooltipText="照片在整个画框中所占的比例。值越大，照片越大。" />
-        <div className="range-group">
-          <input
-            type="range"
-            className="range-input"
-            min="50"
-            max="100"
-            value={config.mainImageRatio}
-            onChange={(e) => handleRangeChange('mainImageRatio', Number(e.target.value))}
-          />
-          <span className="range-value">{config.mainImageRatio}%</span>
-        </div>
-      </div>
-
-      {/* 圆角大小 */}
-      <div className="form-group">
-        <LabelWithTooltip label="圆角大小" tooltipText="照片边缘的圆角弧度。值越大，圆角越明显。" />
-        <div className="range-group">
-          <input
-            type="range"
-            className="range-input"
-            min="0"
-            max="200"
-            step="1"
-            value={config.cornerRadius}
-            onChange={(e) => handleRangeChange('cornerRadius', Number(e.target.value))}
-          />
-          <span className="range-value">{config.cornerRadius}</span>
-        </div>
-      </div>
-
-      {/* 阴影大小 */}
-      <div className="form-group">
-        <LabelWithTooltip label="阴影大小" tooltipText="照片下方的阴影效果强度。值越大，阴影越弥散。" />
-        <div className="range-group">
-          <input
-            type="range"
-            className="range-input"
-            min="0"
-            max="20"
-            value={config.shadowSize}
-            onChange={(e) => handleRangeChange('shadowSize', Number(e.target.value))}
-          />
-          <span className="range-value">{config.shadowSize}</span>
-        </div>
-      </div>
-
-      {/* 输出质量 */}
       <div className="form-group">
         <LabelWithTooltip label="输出质量" tooltipText="生成JPG图片的压缩质量。100为最高质量，文件也最大。" />
         <div className="range-group">
@@ -132,7 +81,50 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
         </div>
       </div>
 
-      {/* 输出宽高比 */}
+      {/* --- 布局与画框 --- */}
+      <div className="form-group">
+        <LabelWithTooltip label="主图占比" tooltipText="照片在整个画框中所占的比例。值越大，照片越大。" />
+        <div className="range-group">
+          <input
+            type="range"
+            className="range-input"
+            min="50"
+            max="100"
+            value={config.mainImageRatio}
+            onChange={(e) => handleRangeChange('mainImageRatio', Number(e.target.value))}
+          />
+          <span className="range-value">{config.mainImageRatio}%</span>
+        </div>
+      </div>
+      <div className="form-group">
+        <LabelWithTooltip label="圆角大小" tooltipText="照片边缘的圆角弧度。值越大，圆角越明显。" />
+        <div className="range-group">
+          <input
+            type="range"
+            className="range-input"
+            min="0"
+            max="200"
+            step="1"
+            value={config.cornerRadius}
+            onChange={(e) => handleRangeChange('cornerRadius', Number(e.target.value))}
+          />
+          <span className="range-value">{config.cornerRadius}</span>
+        </div>
+      </div>
+      <div className="form-group">
+        <LabelWithTooltip label="阴影大小" tooltipText="照片下方的阴影效果强度。值越大，阴影越弥散。" />
+        <div className="range-group">
+          <input
+            type="range"
+            className="range-input"
+            min="0"
+            max="20"
+            value={config.shadowSize}
+            onChange={(e) => handleRangeChange('shadowSize', Number(e.target.value))}
+          />
+          <span className="range-value">{config.shadowSize}</span>
+        </div>
+      </div>
       <div className="checkbox-group">
         <LabelWithTooltip label="启用自定义尺寸" tooltipText="开启后可手动设定输出图片的分辨率（宽度和高度）。" />
         <Switch 
@@ -140,7 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
           onChange={(e) => handleCheckboxChange('useCustomOutputSize', e.target.checked)}
         />
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '10px' }}>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '10px', marginBottom: '20px' }}>
         <input
           type="number"
           className="form-control"
@@ -162,7 +154,33 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
         />
       </div>
 
-      {/* 字体选择 */}
+      {/* --- 背景设置 --- */}
+      <div className="form-group">
+        <div className="checkbox-group">
+            <LabelWithTooltip label="纯色背景" tooltipText="使用从图片主色调提取的纯色作为背景，替代默认的毛玻璃效果。" />
+            <Switch
+              checked={config.pureBackground}
+              onChange={(e) => handleCheckboxChange('pureBackground', e.target.checked)}
+            />
+        </div>
+      </div>
+      <div className="form-group" style={{ opacity: config.pureBackground ? 0.5 : 1 }}>
+        <LabelWithTooltip label="背景模糊度" tooltipText="调整毛玻璃背景的模糊程度。值越大，背景越模糊。" />
+        <div className="range-group">
+          <input
+            type="range"
+            className="range-input"
+            min="0"
+            max="100"
+            value={config.backgroundBlur}
+            onChange={(e) => handleRangeChange('backgroundBlur', Number(e.target.value))}
+            disabled={config.pureBackground}
+          />
+          <span className="range-value">{config.backgroundBlur}</span>
+        </div>
+      </div>
+
+      {/* --- 文字与内容 --- */}
       <div className="form-group" style={{ marginTop: '20px' }}>
         <LabelWithTooltip label="字体选择" tooltipText="选择水印文字所使用的字体。" />
         <select
@@ -181,8 +199,6 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
           <option value="'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', serif">楷体</option>
         </select>
       </div>
-
-      {/* 字体大小 */}
       <div className="form-group">
         <LabelWithTooltip label="字体大小" tooltipText="调整水印文字的相对大小。" />
         <div className="range-group">
@@ -197,14 +213,12 @@ const Sidebar: React.FC<SidebarProps> = ({ config, onConfigChange, onSelectOutpu
           <span className="range-value">{config.fontSizeRatio}%</span>
         </div>
       </div>
-
-      {/* 其他开关 */}
-      <div className="form-group" style={{ marginTop: '20px' }}>
+      <div className="form-group">
         <div className="checkbox-group">
-            <LabelWithTooltip label="纯色背景" tooltipText="使用从图片主色调提取的纯色作为背景，替代默认的毛玻璃效果。" />
+            <LabelWithTooltip label="等效焦距转换" tooltipText="开启后，将自动把照片的焦距转换为35mm全画幅等效焦距进行显示。" />
             <Switch
-              checked={config.pureBackground}
-              onChange={(e) => handleCheckboxChange('pureBackground', e.target.checked)}
+              checked={config.use35mmEquivalent}
+              onChange={(e) => handleCheckboxChange('use35mmEquivalent', e.target.checked)}
             />
         </div>
       </div>

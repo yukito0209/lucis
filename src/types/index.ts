@@ -11,6 +11,8 @@ export interface WatermarkConfig {
   useCustomOutputSize: boolean;
   fontFamily: string;
   fontSizeRatio: number;
+  use35mmEquivalent: boolean;
+  backgroundBlur: number;
 }
 
 export interface PhotoExif {

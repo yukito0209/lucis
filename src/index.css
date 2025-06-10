@@ -1,11 +1,36 @@
 :root {
-  --bg-color: #eef2f9;
-  --bg-color-darker: #e6eaf1;
-  --text-color: #5b687f;
-  --primary-color: #0969da;
-  --primary-color-light: #4c98f0;
-  --shadow-light: #ffffff;
-  --shadow-dark: #d2d8e4;
+  /* 浅色玻璃拟态色彩方案 */
+  --bg-primary: linear-gradient(135deg, #CCCCFF 0%, #99CCFF 100%);
+  --bg-secondary: linear-gradient(135deg, #99CCFF 0%, #FFFFFF 100%);
+  --bg-tertiary: linear-gradient(135deg, #FFFFFF 0%, #CCCCFF 100%);
+  
+  /* 玻璃效果基础色彩 - 调整为深色系以在浅背景上显示 */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-bg-hover: rgba(255, 255, 255, 0.6);
+  --glass-bg-active: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-border-strong: rgba(255, 255, 255, 0.8);
+  
+  /* 文字颜色 - 改为深色系以确保可读性 */
+  --text-primary: rgba(51, 51, 102, 0.9);
+  --text-secondary: rgba(51, 51, 102, 0.7);
+  --text-muted: rgba(51, 51, 102, 0.5);
+  
+  /* 浅蓝品牌色彩 */
+  --primary-color: #99CCFF;
+  --primary-color-light: #CCCCFF;
+  --primary-glass: rgba(153, 204, 255, 0.4);
+  
+  /* 阴影效果 - 调整为适合浅色背景 */
+  --shadow-glass: 0 8px 32px rgba(153, 204, 255, 0.3);
+  --shadow-glass-strong: 0 8px 32px rgba(153, 204, 255, 0.4);
+  --shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  
+  /* 模糊效果强度 */
+  --blur-light: 10px;
+  --blur-medium: 15px;
+  --blur-strong: 20px;
+  
   --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -19,13 +44,27 @@ body {
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background: var(--bg-primary);
+  background-attachment: fixed;
+  color: var(--text-primary);
   overflow: hidden;
 }
 
 .app-container {
   height: 100vh;
+  position: relative;
+}
+
+/* 静态背景层 */
+.app-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  z-index: -1;
 }
 
 #root {
@@ -36,49 +75,95 @@ body {
 
 .app {
   display: flex;
-  height: calc(100vh - 36px); /* 减去标题栏高度 */
-  margin-top: 36px; /* 为标题栏留出空间 */
+  height: calc(100vh - 36px);
+  margin-top: 36px;
 }
 
+/* 玻璃拟态侧边栏 */
 .sidebar {
   width: 100%;
   flex-shrink: 0;
-  background-color: var(--bg-color);
-  border-right: 1px solid var(--bg-color-darker);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-medium));
+  -webkit-backdrop-filter: blur(var(--blur-medium));
+  border-right: 1px solid var(--glass-border);
+  border-radius: 0 20px 0 0;
   padding: 24px;
   overflow-y: auto;
+  box-shadow: var(--shadow-glass);
+  position: relative;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 50%, 
+    rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 0 20px 0 0;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .resizer {
   width: 5px;
   cursor: col-resize;
-  background-color: transparent;
+  background: transparent;
   flex-shrink: 0;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.resizer::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 60px;
+  background: var(--glass-border);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.resizer:hover::before,
+.resizer.is-resizing::before {
+  opacity: 1;
 }
 
 .resizer:hover,
 .resizer.is-resizing {
-  background-color: var(--primary-color-light);
+  background: rgba(79, 172, 254, 0.1);
 }
 
 .main-content {
   display: grid;
-  grid-template-rows: 1fr auto auto; /* 预览(1fr), 列表(auto), 页脚(auto) */
+  grid-template-rows: 1fr auto auto;
   flex: 1;
-  overflow: hidden; /* 确保内容不会溢出grid容器 */
-  background-color: var(--bg-color);
+  overflow: hidden;
 }
 
+/* 玻璃拟态预览区域 */
 .preview-area {
-  position: relative; /* Make it a positioning context */
-  overflow: auto; /* 保持可滚动以便在放大时平移 */
-  min-height: 0; /* 一个关键的修复，防止grid/flex子项在缩小时溢出 */
+  position: relative;
+  overflow: auto;
+  min-height: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
 }
 
-/* Wrapper for the entire zoomable/pannable content */
 .zoomable-content-wrapper {
   width: 100%;
   height: 100%;
@@ -86,11 +171,10 @@ body {
   flex-direction: column;
 }
 
-/* The area that contains the canvas, designed to grow */
 .preview-canvas-container {
   flex: 1 1 0;
-  min-height: 0; /* Important flexbox fix to allow shrinking */
-  min-width: 0; /* Added to prevent overflow from wide content */
+  min-height: 0;
+  min-width: 0;
   width: 100%;
   display: flex;
   align-items: center;
@@ -98,78 +182,139 @@ body {
 }
 
 .preview-photo-name {
-  flex-shrink: 0; /* Prevent this from shrinking */
-  padding-top: 16px; /* Use padding instead of margin for more stable layout */
+  flex-shrink: 0;
+  padding-top: 16px;
   text-align: center;
-  color: #666;
+  color: var(--text-secondary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  border-radius: 12px;
+  padding: 12px 24px;
+  margin-top: 16px;
+  border: 1px solid var(--glass-border);
 }
 
+/* 玻璃拟态页脚 */
 .footer {
   height: 80px;
-  background-color: var(--bg-color);
-  border-top: 1px solid var(--bg-color-darker);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-strong));
+  -webkit-backdrop-filter: blur(var(--blur-strong));
+  border-top: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  position: relative;
 }
 
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+}
+
+/* 玻璃拟态按钮 */
 .button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  padding: 12px 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease-out;
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-glass);
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left 0.5s ease;
 }
 
 .button:hover {
-  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(153, 204, 255, 0.4);
+}
+
+.button:hover::before {
+  left: 100%;
 }
 
 .button:active {
-  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+  transform: translateY(0);
+  background: var(--glass-bg-active);
 }
 
 .button.primary {
-  background-color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.8);
+  border-color: rgba(37, 99, 235, 0.6);
   color: white;
+  font-weight: 600;
 }
 
 .button.primary:hover {
-  background-color: var(--primary-color-light);
+  background: rgba(29, 78, 216, 0.9);
+  border-color: rgba(29, 78, 216, 0.8);
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.6);
 }
 
 .button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+  transform: none;
 }
 
+.button:disabled:hover {
+  transform: none;
+  background: var(--glass-bg);
+}
+
+/* 表单组件玻璃拟态 */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .form-label-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .form-label {
   display: block;
-  margin-bottom: 0; /* Adjusted since wrapper has margin */
+  margin-bottom: 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
-/* Tooltip Styles */
+/* 工具提示玻璃拟态 */
 .tooltip-container {
   position: relative;
   display: inline-flex;
@@ -178,36 +323,49 @@ body {
 }
 
 .tooltip-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background-color: var(--bg-color-darker);
-  color: var(--text-color);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
   font-size: 11px;
   font-weight: bold;
   text-align: center;
   line-height: 16px;
   cursor: help;
-  box-shadow: inset 1px 1px 2px var(--shadow-dark), inset -1px -1px 2px var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+.tooltip-icon:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-strong);
+  transform: scale(1.1);
 }
 
 .tooltip-text {
   visibility: hidden;
-  width: 200px;
-  background-color: #555;
+  width: 220px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(var(--blur-medium));
+  -webkit-backdrop-filter: blur(var(--blur-medium));
   color: #fff;
   text-align: center;
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
   position: absolute;
-  z-index: 1;
+  z-index: 1000;
   bottom: 150%;
   left: 50%;
-  margin-left: -100px; /* Use half of the width to center the tooltip */
+  margin-left: -110px;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: all 0.3s ease;
   font-size: 12px;
   font-weight: normal;
+  box-shadow: var(--shadow-glass);
 }
 
 .tooltip-text::after {
@@ -218,49 +376,65 @@ body {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #555 transparent transparent transparent;
+  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
 
 .tooltip-container:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
+  transform: translateY(-5px);
 }
 
+/* 玻璃拟态输入框 */
 .form-control {
   width: 100%;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
   font-size: 14px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
-  transition: all 0.2s;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-inset);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
 }
 
 .form-control:focus {
   outline: none;
-  box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+  border-color: var(--primary-color);
+  background: var(--glass-bg-hover);
+  box-shadow: 0 0 0 3px rgba(153, 204, 255, 0.3), var(--shadow-inset);
 }
 
+/* 玻璃拟态范围输入 */
 .range-group {
   display: grid;
-  grid-template-columns: 1fr 40px;
+  grid-template-columns: 1fr 50px;
   align-items: center;
-  gap: 12px;
-  padding: 4px;
-  border-radius: 8px;
-  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-inset);
 }
 
 .range-input {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 8px;
-  background: var(--bg-color-darker);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(153, 204, 255, 0.3);
+  border-radius: 3px;
   outline: none;
+  transition: all 0.3s ease;
 }
 
 .range-input::-webkit-slider-thumb {
@@ -268,29 +442,41 @@ body {
   appearance: none;
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--primary-color);
   border-radius: 50%;
-  border: 2px solid var(--primary-color);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(153, 204, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(153, 204, 255, 0.6);
 }
 
 .range-input::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--primary-color);
   border-radius: 50%;
-  border: 2px solid var(--primary-color);
+  border: 2px solid rgba(255, 255, 255, 0.6);
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(153, 204, 255, 0.4);
 }
 
 .range-value {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-color);
+  font-weight: 600;
+  color: var(--text-primary);
   text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--glass-border);
 }
 
+/* 玻璃拟态开关 */
 .checkbox-group {
   display: flex;
   align-items: center;
@@ -298,18 +484,19 @@ body {
   justify-content: space-between;
 }
 
-/* Custom Switch styling */
 .switch {
   position: relative;
   display: inline-block;
-  width: 44px;
-  height: 24px;
+  width: 48px;
+  height: 26px;
 }
+
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .slider {
   position: absolute;
   cursor: pointer;
@@ -317,11 +504,15 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--bg-color-darker);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  border: 1px solid var(--glass-border);
   transition: .4s;
-  border-radius: 24px;
-  box-shadow: inset 1px 1px 2px var(--shadow-dark);
+  border-radius: 26px;
+  box-shadow: var(--shadow-inset);
 }
+
 .slider:before {
   position: absolute;
   content: "";
@@ -329,36 +520,36 @@ body {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background: white;
   transition: .4s;
   border-radius: 50%;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
 input:checked + .slider {
-  background-color: var(--primary-color);
+  background: var(--primary-glass);
+  border-color: var(--primary-color);
 }
+
 input:checked + .slider:before {
-  transform: translateX(20px);
+  transform: translateX(22px);
+  box-shadow: 0 2px 8px rgba(153, 204, 255, 0.4);
 }
-/* End of Switch styling */
 
-
+/* 预览容器玻璃拟态 */
 .preview-container {
-  /* This container is now just a simple sizing box. */
   max-width: 100%;
   max-height: 100%;
-  /* All visual properties (radius, shadow, background) are removed 
-     and will be handled directly on the canvas drawing itself for consistency. */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .preview-canvas {
-  /* The canvas now gets the border-radius for a consistent look.
-     The clipping is handled inside the drawing logic. */
   display: block;
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-glass-strong);
+  border: 1px solid var(--glass-border);
 }
 
 .footer-stats,
@@ -368,38 +559,55 @@ input:checked + .slider:before {
   gap: 16px;
 }
 
+/* 玻璃拟态无图片状态 */
 .no-image {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--text-color);
+  color: var(--text-secondary);
   font-size: 16px;
   width: 80%;
   height: 80%;
-  border-radius: 12px;
-  box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+  border-radius: 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-medium));
+  -webkit-backdrop-filter: blur(var(--blur-medium));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
 }
 
 .no-image-icon {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   margin-bottom: 16px;
-  opacity: 0.5;
-  filter: grayscale(1);
+  opacity: 0.6;
+  font-size: 48px;
 }
 
-/* Photo List Styles */
+/* 玻璃拟态照片列表 */
 .photo-list-container {
   height: 100px;
-  padding: 10px 0;
-  background-color: var(--bg-color-darker);
-  border-top: 1px solid var(--shadow-dark);
-  flex-shrink: 0; /* 防止在flex/grid布局中被意外压缩 */
+  padding: 12px 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-strong));
+  -webkit-backdrop-filter: blur(var(--blur-strong));
+  border-top: 1px solid var(--glass-border);
+  flex-shrink: 0;
+  position: relative;
 }
 
-.photo-list {
-  /* This class is used by react-window's outer container */
+.photo-list-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
 }
 
 .thumbnail-item-container {
@@ -412,25 +620,89 @@ input:checked + .slider:before {
   flex-shrink: 0;
   width: 80px;
   height: 80px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+  border: 2px solid var(--glass-border);
+  transition: all 0.3s ease;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  box-shadow: var(--shadow-glass);
 }
 
 .thumbnail-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.05);
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 8px 25px rgba(153, 204, 255, 0.4);
 }
 
 .thumbnail-item.active {
   border-color: var(--primary-color);
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  box-shadow: 0 8px 25px rgba(153, 204, 255, 0.6);
+  background: var(--primary-glass);
 }
 
 .thumbnail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* 加载和错误状态的玻璃拟态 */
+.thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--glass-bg-hover);
+  backdrop-filter: blur(var(--blur-light));
+  -webkit-backdrop-filter: blur(var(--blur-light));
+  border-radius: 8px;
+}
+
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border-left-color: var(--primary-color);
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 20px;
+  color: #F87171;
+  font-weight: bold;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .sidebar {
+    border-radius: 0 15px 0 0;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .tooltip-text {
+    border-width: 0.5px;
+  }
+  
+  .form-control,
+  .slider,
+  .thumbnail-item {
+    border-width: 0.5px;
+  }
 } 
