@@ -1,4 +1,4 @@
-# 📷 Lucis 拾光 - 现代化照片水印工具
+# Lucis 拾光 - 现代化照片水印工具
 
 > **简介**: 这是一个基于 Electron + React + TypeScript 构建的现代化照片水印工具，采用了最新的 Glassmorphism（玻璃拟态）设计风格。
 
@@ -17,26 +17,22 @@
 ## 📸 界面预览
 
 ### 主界面截图
-![主界面](docs/images/main-interface.png)
+![image](https://github.com/user-attachments/assets/1fa001f8-1fe5-4699-bad5-f7574840b71d)
 *现代化的 Glassmorphism 设计风格，左侧参数面板，中央实时预览区域*
 
-### 实时预览演示
-![实时预览](docs/images/realtime-preview.gif)
+### 实时预览截图
+![image](https://github.com/user-attachments/assets/1d84f96b-a29a-48fc-8bfa-ba596ee1bd82)
 *参数调整时的实时预览效果，无需重新生成即可看到变化*
 
 ## 🎨 生成效果展示
 
 ### 横图效果
-![横图示例](docs/images/landscape-example.jpg)
+![image](public/assets/samples/DSC01943_watermark_1749587643628.jpg)
 *横构图照片的水印效果展示*
 
 ### 竖图效果  
-![竖图示例](docs/images/portrait-example.jpg)
+![image](public/assets/samples/DSC02021_watermark_1749587644485.jpg)
 *竖构图照片的水印效果展示*
-
-### 强制横屏输出
-![横屏输出示例](docs/images/landscape-output-example.jpg)
-*竖构图照片强制横屏输出的效果*
 
 ## ✨ 核心特性
 
