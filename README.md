@@ -200,7 +200,7 @@ lucis/
 <table>
   <tr>
     <td align="center">
-      <strong>微信支付</strong><br/>
+      <strong>微信</strong><br/>
       <img src="public/assets/pay/wechat-pay.jpg" alt="微信收款码" width="200"/>
     </td>
     <td align="center">
@@ -209,8 +209,6 @@ lucis/
     </td>
   </tr>
 </table>
-
-> 您的支持是我继续开发和维护这个项目的动力！
 
 ## 🙏 致谢
 
@@ -221,11 +219,4 @@ lucis/
 
 [MIT LICENSE](LICENSE)
 
-## 🔗 相关链接
 
-- **项目主页**: [https://github.com/yukito0209/lucis](https://github.com/yukito0209/lucis)
-- **反馈和建议**: [Issues](https://github.com/yukito0209/lucis/issues)
-
----
-
-> 🌟 **如果这个项目对您有帮助，请给一个 Star ⭐ 支持一下！**
