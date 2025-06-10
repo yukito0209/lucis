@@ -8,11 +8,35 @@
 
 ## 🌟 开发初衷
 
-在使用 [yiyin](https://github.com/ggchivalrous/yiyin) 这个优秀的照片水印工具时，我发现它缺少一个重要功能：**无法实时预览水印效果**。每次调整参数都需要重新生成图片才能看到效果，这大大降低了工作效率。
+在使用照片水印工具 [yiyin](https://github.com/ggchivalrous/yiyin) 时，我发现它缺少一个重要功能：**无法实时预览水印效果**。每次调整参数都需要重新生成图片才能看到效果，导致效率不高。
 
-作为一名非专业开发者，我决定使用 **Cursor AI** 作为开发助手，从零开始构建一个具有实时预览功能的照片水印工具。这个项目不仅解决了预览问题，还融入了现代化的 Glassmorphism 设计风格，提供更优雅的用户体验。
+为了解决这一问题，本人作为非专业开发者，决定使用 **Cursor** 作为开发助手，从零开始构建一个具有实时预览功能的照片水印工具。这个项目不仅解决了预览问题，还融入了现代化的 Glassmorphism 设计风格，提供更优雅的用户体验。
 
 **项目地址**: [https://github.com/yukito0209/lucis](https://github.com/yukito0209/lucis)
+
+## 📸 界面预览
+
+### 主界面截图
+![主界面](docs/images/main-interface.png)
+*现代化的 Glassmorphism 设计风格，左侧参数面板，中央实时预览区域*
+
+### 实时预览演示
+![实时预览](docs/images/realtime-preview.gif)
+*参数调整时的实时预览效果，无需重新生成即可看到变化*
+
+## 🎨 生成效果展示
+
+### 横图效果
+![横图示例](docs/images/landscape-example.jpg)
+*横构图照片的水印效果展示*
+
+### 竖图效果  
+![竖图示例](docs/images/portrait-example.jpg)
+*竖构图照片的水印效果展示*
+
+### 强制横屏输出
+![横屏输出示例](docs/images/landscape-output-example.jpg)
+*竖构图照片强制横屏输出的效果*
 
 ## ✨ 核心特性
 
@@ -44,20 +68,6 @@
 - **EXIF 读取**: exifr
 - **UI 优化**: react-window (虚拟滚动)
 - **开发辅助**: Cursor AI
-
-## 🎪 界面预览
-
-### 主界面
-- 左侧：参数调整面板（Glassmorphism 风格）
-- 中央：实时预览区域（支持缩放拖拽）
-- 底部：照片列表和操作按钮
-- 顶部：自定义标题栏
-
-### 设计特色
-- **玻璃拟态效果**: 半透明材质 + backdrop-filter 模糊
-- **多层次阴影**: 精心调校的光影效果
-- **渐变背景**: 动态色彩过渡
-- **微交互动画**: 细腻的用户体验
 
 ## 🚀 快速开始
 
@@ -194,7 +204,7 @@ lucis/
 
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+[MIT LICENSE](LICENSE)
 
 ## 🔗 相关链接
 
