@@ -57,6 +57,7 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
+      "public/assets/**/*",
       "package.json"
     ],
     "mac": {
