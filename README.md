@@ -1,9 +1,9 @@
 # Lucis 拾光 - 现代化照片水印工具
 
-> **简介**: 这是一个基于 Electron + React + TypeScript 构建的现代化照片水印工具，采用了最新的 Glassmorphism（玻璃拟态）设计风格。
+> 这是一个基于 Electron + React + TypeScript 构建的现代化照片水印工具，采用了最新的 Glassmorphism（玻璃拟态）设计风格。
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightpink.svg)
 ![Version](https://img.shields.io/badge/Version-v1.0.0-green.svg)
 
 ## 🌟 开发初衷
@@ -11,8 +11,6 @@
 在使用照片水印工具 [yiyin](https://github.com/ggchivalrous/yiyin) 时，我发现它缺少一个重要功能：**无法实时预览水印效果**。每次调整参数都需要重新生成图片才能看到效果，导致效率不高。
 
 为了解决这一问题，本人作为非专业开发者，决定使用 **Cursor** 作为开发助手，从零开始构建一个具有实时预览功能的照片水印工具。这个项目不仅解决了预览问题，还融入了现代化的 Glassmorphism 设计风格，提供更优雅的用户体验。
-
-**项目地址**: [https://github.com/yukito0209/lucis](https://github.com/yukito0209/lucis)
 
 ## 📸 界面预览
 
@@ -182,17 +180,6 @@ lucis/
 4. **格式支持**: 主要支持 JPEG 格式
 5. **存储空间**: 确保输出目录有足够空间
 
-## 🤝 贡献指南
-
-欢迎参与项目开发！
-
-### 开发流程
-1. Fork 项目到自己的仓库
-2. 创建新分支: `git checkout -b feature/新功能`
-3. 提交更改: `git commit -m '添加新功能'`
-4. 推送分支: `git push origin feature/新功能`
-5. 提交 Pull Request
-
 ## 💖 支持作者
 
 如果这个项目对您有帮助，欢迎请作者喝杯咖啡 ☕
@@ -213,7 +200,6 @@ lucis/
 ## 🙏 致谢
 
 - **[yiyin](https://github.com/ggchivalrous/yiyin)**: 提供了项目灵感和参考
-- **[Cursor](https://www.cursor.com/cn)**: 作为非专业开发者的得力助手
 
 ## 📄 许可证
 
